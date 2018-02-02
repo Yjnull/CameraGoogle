@@ -10,13 +10,39 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
+
+
     </FrameLayout>
 
-    <Button
-        android:id="@+id/btn_capture"
-        android:gravity="center"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Capture"/>
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/btn_capture"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capture"/>
+        <Button
+            android:id="@+id/btn_check_feature"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check Feature"/>
+
+        <Button
+            android:id="@+id/btn_focus"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AUTO FOCUS"/>
+        <com.yjnull.cameragoogle.camera.FaceView
+            android:id="@+id/face_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
 
 </LinearLayout>

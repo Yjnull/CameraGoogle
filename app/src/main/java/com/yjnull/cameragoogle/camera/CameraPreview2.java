@@ -1,6 +1,12 @@
 package com.yjnull.cameragoogle.camera;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -25,11 +31,20 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
         mHolder.addCallback(this);
     }
 
+    public void startFaceDetection(){
+        if (mCamera.getParameters().getMaxNumDetectedFaces() > 0) {
+            mCamera.startFaceDetection();
+        }
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        Log.d(TAG, "surfaceCreated: 预览创建了--------------");
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
+
+
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
@@ -37,7 +52,7 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        Log.d(TAG, "surfaceChanged: 预览改变了--------------");
         if (mHolder.getSurface() == null) {
             return;
         }
@@ -56,6 +71,9 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
+
+            startFaceDetection();
+
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
@@ -66,5 +84,29 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
+        Log.d(TAG, "surfaceDestroyed: 预览Destroy了--------------");
+    }
+
+
+
+    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    public class MyFaceDetectionListener implements Camera.FaceDetectionListener {
+
+        @Override
+        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+            mPaint.setColor(Color.YELLOW);
+            Canvas canvas = new Canvas();
+
+            for (Camera.Face face : faces) {
+                Log.d("FaceDetection", "face detected: " + faces.length +
+                        " Face 1 Location X: " + faces[0].rect.centerX() +
+                        "  Y: " + faces[0].rect.centerY());
+                RectF rect = new RectF(face.rect);
+                RectF rect2 = new RectF(100, 100, 100, 100);
+                if (canvas != null)
+                    canvas.drawRect(rect2, mPaint);
+            }
+
+        }
     }
 }

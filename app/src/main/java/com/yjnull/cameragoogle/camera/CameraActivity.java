@@ -2,33 +2,34 @@ package com.yjnull.cameragoogle.camera;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.Camera;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.yjnull.cameragoogle.MainActivity;
 import com.yjnull.cameragoogle.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static com.yjnull.cameragoogle.camera.FileUtils.getOutputMediaFile;
 
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = "CameraActivity";
 
     private Camera mCamera;
     private CameraPreview2 mPreview2;
+    private FaceView faceView;
 
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
         @Override
@@ -55,6 +56,23 @@ public class CameraActivity extends AppCompatActivity {
         }
     };
 
+    private Handler mMainHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+                case EventUtil.UPDATE_FACE_RECT:
+                    Camera.Face[] faces = (Camera.Face[]) msg.obj;
+                    faceView.setFaces(faces);
+                    mCamera.takePicture(null, null, mPictureCallback);
+
+                    break;
+            }
+
+            super.handleMessage(msg);
+        }
+    };
+
     //1. 检查是否存在摄像头硬件
     private boolean checkCameraHardware(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -77,11 +95,48 @@ public class CameraActivity extends AppCompatActivity {
             Camera.Parameters params = mCamera.getParameters();
 
             //白平衡、自动聚焦、照片品质
-
-            List<String> focusModes = params.getSupportedFocusModes();
-            for (String modes : focusModes) {
-                Log.d(TAG, "getSupportedFocusModes: " + modes);
+            for (Camera.Size size : params.getSupportedPictureSizes()) {
+                Log.d(TAG, "  照片支持大小: " + size.width + "x" + size.height);
             }
+            for (Camera.Size size : params.getSupportedPreviewSizes()) {
+                Log.d(TAG, "  预览支持大小: " + size.width + "x" + size.height);
+            }
+
+
+            params.setPictureSize(3200, 2400);
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
+            params.setJpegThumbnailQuality(100);
+            params.setJpegQuality(100);
+            params.setPictureFormat(ImageFormat.JPEG);
+            Log.d(TAG, "  照片大小: " + params.getPictureSize().width +"x"+ params.getPictureSize().height);
+            Log.d(TAG, "  预览大小: " + params.getPreviewSize().width + "x" + params.getPreviewSize().height);
+            Log.d(TAG, "  聚焦: " + params.getFocusMode());
+            //Log.d(TAG, "  聚焦区域: " + params.getFocusAreas().toString());
+            Log.d(TAG, "  白平衡: " + params.getWhiteBalance());
+            Log.d(TAG, "  照片缩略图大小: " + params.getJpegThumbnailSize().width + "x" + params.getJpegThumbnailSize().height);
+            Log.d(TAG, "  照片缩略图品质: " + params.getJpegThumbnailQuality());
+            Log.d(TAG, "  照片品质: " + params.getJpegQuality());
+            //Log.d(TAG, "  测光区域: " + params.getMeteringAreas().toString());
+            Log.d(TAG, "  最大测光区域数量: " + params.getMaxNumMeteringAreas());
+            Log.d(TAG, "  最大聚焦区域数量: " + params.getMaxNumFocusAreas());
+            if (params.getMaxNumMeteringAreas() > 0) {
+                List<Camera.Area> meteringAreas = new ArrayList<>();
+
+                Rect area1 = new Rect(-100, -100, 100, 100);
+                meteringAreas.add(new Camera.Area(area1, 600));
+                params.setFocusAreas(meteringAreas);
+
+                Rect area2 = new Rect(800, -1000, 1000, -800);
+                meteringAreas.add(new Camera.Area(area2, 400));
+
+                params.setMeteringAreas(meteringAreas);
+
+            }
+
+            mCamera.setParameters(params);
+            mCamera.setFaceDetectionListener(new GoogleFaceDetect(CameraActivity.this, mMainHandler));
+
         }
 
     }
@@ -92,11 +147,14 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
 
         mCamera = getCameraInstance();
+        checkCameraFeatures();
 
         // 创建Preview and set it as the content of our activity
         mPreview2 = new CameraPreview2(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        faceView = (FaceView) findViewById(R.id.face_view);
         preview.addView(mPreview2);
+
 
 
         //拍照
@@ -109,6 +167,28 @@ public class CameraActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Button checkFeatureBtn = (Button) findViewById(R.id.btn_check_feature);
+        checkFeatureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkCameraFeatures();
+            }
+        });
+
+        Button autoFocus = (Button) findViewById(R.id.btn_focus);
+        autoFocus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {
+                        Log.d(TAG, "onAutoFocus: " + success);
+                    }
+                });
+            }
+        });
+
 
     }
 
