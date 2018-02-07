@@ -1,6 +1,7 @@
 package com.yjnull.cameragoogle.camera;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -30,6 +31,7 @@ public class CameraActivity extends AppCompatActivity {
     private Camera mCamera;
     private CameraPreview2 mPreview2;
     private FaceView faceView;
+    private FrameLayout preview;
 
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
         @Override
@@ -64,7 +66,9 @@ public class CameraActivity extends AppCompatActivity {
                 case EventUtil.UPDATE_FACE_RECT:
                     Camera.Face[] faces = (Camera.Face[]) msg.obj;
                     faceView.setFaces(faces);
-                    mCamera.takePicture(null, null, mPictureCallback);
+                    preview.removeView(faceView);
+                    preview.addView(faceView);
+                    //mCamera.takePicture(null, null, mPictureCallback);
 
                     break;
             }
@@ -151,10 +155,9 @@ public class CameraActivity extends AppCompatActivity {
 
         // 创建Preview and set it as the content of our activity
         mPreview2 = new CameraPreview2(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        faceView = (FaceView) findViewById(R.id.face_view);
+        preview = (FrameLayout) findViewById(R.id.camera_preview);
+        faceView = new FaceView(this);
         preview.addView(mPreview2);
-
 
 
         //拍照
@@ -172,7 +175,8 @@ public class CameraActivity extends AppCompatActivity {
         checkFeatureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkCameraFeatures();
+                //checkCameraFeatures();
+                startActivity(new Intent(CameraActivity.this, TestActivity.class));
             }
         });
 

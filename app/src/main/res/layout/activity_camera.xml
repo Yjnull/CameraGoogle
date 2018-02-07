@@ -37,10 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="AUTO FOCUS"/>
-        <com.yjnull.cameragoogle.camera.FaceView
-            android:id="@+id/face_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 
