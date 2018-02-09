@@ -48,7 +48,7 @@ public class TestTextView extends TextView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        /*int x = (int) event.getRawX();
+        int x = (int) event.getRawX();
         int y = (int) event.getRawY();
 
         switch (event.getAction()) {
@@ -85,10 +85,10 @@ public class TestTextView extends TextView {
         }
 
         mLastX = x;
-        mLastY = y;*/
-        //return true;
-        Log.d(TAG, "move, onTouchEvent--------: ");
-        return super.onTouchEvent(event);
+        mLastY = y;
+        return true;
+        /*Log.d(TAG, "move, onTouchEvent--------: ");
+        return super.onTouchEvent(event);*/
     }
 
     private void smoothScrollTo(int destX, int destY) {

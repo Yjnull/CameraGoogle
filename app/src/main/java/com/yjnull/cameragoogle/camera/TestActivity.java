@@ -79,7 +79,6 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-
         //FaceView faceView = new FaceView(this);
         //testFrame.addView(faceView);
 
