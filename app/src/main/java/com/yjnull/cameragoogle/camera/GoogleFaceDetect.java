@@ -23,11 +23,25 @@ public class GoogleFaceDetect implements Camera.FaceDetectionListener {
     @Override
     public void onFaceDetection(Camera.Face[] faces, Camera camera) {
         Log.d(TAG, "onFaceDetection: 人脸检测回调");
+        Message msg = mHandler.obtainMessage();
+        msg.what = EventUtil.UPDATE_FACE_RECT;
         if (faces != null && faces.length > 0) {
-            Message msg = mHandler.obtainMessage();
-            msg.what = EventUtil.UPDATE_FACE_RECT;
             msg.obj = faces;
-            msg.sendToTarget();
+            msg.arg1 = isRangeFaceDetect(faces[0]) ? 0 : -1; //0代表在区域内，-1代表不再区域内
+        } else {
+            msg.obj = null;
         }
+        msg.sendToTarget();
+    }
+
+    public boolean isRangeFaceDetect(Camera.Face face) {
+        if ((face.rect.left >= -150 && face.rect.left <= 150) &&
+                (face.rect.top >= -500 && face.rect.left <= -10) &&
+                (face.rect.right >= 120 && face.rect.left <= 480) &&
+                (face.rect.bottom >= 120 && face.rect.left <= 480)) {
+            Log.d(TAG, "------------------------>  在区域内了..." );
+            return true;
+        } else
+            return false;
     }
 }

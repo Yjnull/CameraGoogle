@@ -36,6 +36,11 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
             mCamera.startFaceDetection();
         }
     }
+    public void stopFaceDetection(){
+        if (mCamera.getParameters().getMaxNumDetectedFaces() > 0) {
+            mCamera.stopFaceDetection();
+        }
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -43,7 +48,6 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
-
 
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
@@ -87,26 +91,4 @@ public class CameraPreview2 extends SurfaceView implements SurfaceHolder.Callbac
         Log.d(TAG, "surfaceDestroyed: 预览Destroy了--------------");
     }
 
-
-
-    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    public class MyFaceDetectionListener implements Camera.FaceDetectionListener {
-
-        @Override
-        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-            mPaint.setColor(Color.YELLOW);
-            Canvas canvas = new Canvas();
-
-            for (Camera.Face face : faces) {
-                Log.d("FaceDetection", "face detected: " + faces.length +
-                        " Face 1 Location X: " + faces[0].rect.centerX() +
-                        "  Y: " + faces[0].rect.centerY());
-                RectF rect = new RectF(face.rect);
-                RectF rect2 = new RectF(100, 100, 100, 100);
-                if (canvas != null)
-                    canvas.drawRect(rect2, mPaint);
-            }
-
-        }
-    }
 }

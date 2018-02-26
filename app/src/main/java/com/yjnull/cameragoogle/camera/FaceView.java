@@ -55,7 +55,7 @@ public class FaceView extends View implements GestureDetector.OnGestureListener,
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLinePaint.setColor(Color.YELLOW);
         mLinePaint.setStyle(Paint.Style.STROKE);
-        mLinePaint.setStrokeWidth(5f);
+        mLinePaint.setStrokeWidth(3f);
 
     }
 
@@ -72,11 +72,26 @@ public class FaceView extends View implements GestureDetector.OnGestureListener,
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d(TAG, "onDraw: ==================== Face View Draw");
-        //canvas.save();
-        mRectF.set(100, 100, 200, 200);
-        canvas.drawRect(mRectF, mLinePaint);
-        //canvas.restore();
+
+        if (mFaces == null || mFaces.length < 1) {
+            return;
+        }
+        EventUtil.prepareMatrix(matrix, false, 0, getWidth(), getHeight());
+        canvas.save();
+        matrix.postRotate(0);
+        canvas.rotate(0);
+        for (int i = 0; i < mFaces.length; i++) {
+            mRectF.set(mFaces[i].rect);
+            matrix.mapRect(mRectF);
+            Log.d(TAG, "onDraw: ===================RectF= left : " + mRectF.left +
+                    " ,top : " + mRectF.top + " ,right : " + mRectF.right + " ,bottom : " + mRectF.bottom);
+            canvas.drawRect(mRectF, mLinePaint);
+        }
+
+        Log.d(TAG, "onDraw: ==================mFaces[0]== left : " + mFaces[0].rect.left +
+                " ,top : " + mFaces[0].rect.top + " ,right : " + mFaces[0].rect.right + " ,bottom : " + mFaces[0].rect.bottom);
+        //mRectF.set(100, 100, 300, 300);
+        //canvas.drawRect(mRectF, mLinePaint);
     }
 
 

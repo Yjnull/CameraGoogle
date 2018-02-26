@@ -33,6 +33,9 @@ public class CameraActivity extends AppCompatActivity {
     private FaceView faceView;
     private FrameLayout preview;
 
+    private int isRange = -1; //人脸是否在范围内
+    private boolean isTakePicture = true; //是否可以拍照
+
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -64,8 +67,14 @@ public class CameraActivity extends AppCompatActivity {
 
             switch (msg.what) {
                 case EventUtil.UPDATE_FACE_RECT:
-                    Camera.Face[] faces = (Camera.Face[]) msg.obj;
-                    faceView.setFaces(faces);
+                    if (msg.obj != null) {
+                        Camera.Face[] faces = (Camera.Face[]) msg.obj;
+                        isRange = msg.arg1;
+                        faceView.setFaces(faces);
+                    } else {
+                        faceView.clearFaces();
+                    }
+
                     preview.removeView(faceView);
                     preview.addView(faceView);
                     //mCamera.takePicture(null, null, mPictureCallback);
@@ -99,12 +108,12 @@ public class CameraActivity extends AppCompatActivity {
             Camera.Parameters params = mCamera.getParameters();
 
             //白平衡、自动聚焦、照片品质
-            for (Camera.Size size : params.getSupportedPictureSizes()) {
+            /*for (Camera.Size size : params.getSupportedPictureSizes()) {
                 Log.d(TAG, "  照片支持大小: " + size.width + "x" + size.height);
             }
             for (Camera.Size size : params.getSupportedPreviewSizes()) {
                 Log.d(TAG, "  预览支持大小: " + size.width + "x" + size.height);
-            }
+            }*/
 
 
             params.setPictureSize(3200, 2400);
@@ -113,7 +122,7 @@ public class CameraActivity extends AppCompatActivity {
             params.setJpegThumbnailQuality(100);
             params.setJpegQuality(100);
             params.setPictureFormat(ImageFormat.JPEG);
-            Log.d(TAG, "  照片大小: " + params.getPictureSize().width +"x"+ params.getPictureSize().height);
+            Log.d(TAG, "  照片大小: " + params.getPictureSize().width + "x" + params.getPictureSize().height);
             Log.d(TAG, "  预览大小: " + params.getPreviewSize().width + "x" + params.getPreviewSize().height);
             Log.d(TAG, "  聚焦: " + params.getFocusMode());
             //Log.d(TAG, "  聚焦区域: " + params.getFocusAreas().toString());
@@ -180,20 +189,54 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
+        mMainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myAutoFocus();
+            }
+        }, 1000);
         Button autoFocus = (Button) findViewById(R.id.btn_focus);
         autoFocus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        Log.d(TAG, "onAutoFocus: " + success);
-                    }
-                });
+                myAutoFocus();
             }
         });
 
+    }
 
+    public void myAutoFocus() {
+        if (mCamera != null) {
+            mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success, Camera camera) {
+                    synchronized (CameraActivity.this) {
+                        if (isRange == 0 && success) {
+                            Log.d(TAG, "------------------------>  拍照了..." );
+                            isRange = -1;
+                            if (isTakePicture) {
+                                mCamera.takePicture(null, null, mPictureCallback);
+                                isTakePicture = false;
+                                mMainHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        isTakePicture = true;
+                                    }
+                                }, 3000);
+                            }
+                        }
+                        Log.d(TAG, "onAutoFocus: " + success);
+                        mMainHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                myAutoFocus();
+                            }
+                        }, 1500);
+                    }
+
+                }
+            });
+        }
     }
 
     @Override
