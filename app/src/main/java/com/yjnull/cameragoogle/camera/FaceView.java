@@ -69,6 +69,14 @@ public class FaceView extends View implements GestureDetector.OnGestureListener,
         invalidate();
     }
 
+    public void setFaceColor(int arg1){
+        if (0 == arg1) {
+            mLinePaint.setColor(Color.RED);
+        } else {
+            mLinePaint.setColor(Color.YELLOW);
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -76,20 +84,31 @@ public class FaceView extends View implements GestureDetector.OnGestureListener,
         if (mFaces == null || mFaces.length < 1) {
             return;
         }
-        EventUtil.prepareMatrix(matrix, false, 0, getWidth(), getHeight());
+        boolean isMirror = false;
+
+        if (CameraBaseInfo.cameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            isMirror = false;
+        } else if (CameraBaseInfo.cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT){
+            isMirror = true;
+        }
+
+        EventUtil.prepareMatrix(matrix, isMirror, 0, getWidth(), getHeight());
         canvas.save();
         matrix.postRotate(0);
         canvas.rotate(0);
         for (int i = 0; i < mFaces.length; i++) {
             mRectF.set(mFaces[i].rect);
             matrix.mapRect(mRectF);
-            Log.d(TAG, "onDraw: ===================RectF= left : " + mRectF.left +
-                    " ,top : " + mRectF.top + " ,right : " + mRectF.right + " ,bottom : " + mRectF.bottom);
+            /*Log.d(TAG, "onDraw: ===================RectF= left : " + mRectF.left +
+                    " ,top : " + mRectF.top + " ,right : " + mRectF.right +
+                    " ,bottom : " + mRectF.bottom);*/
             canvas.drawRect(mRectF, mLinePaint);
         }
 
         Log.d(TAG, "onDraw: ==================mFaces[0]== left : " + mFaces[0].rect.left +
-                " ,top : " + mFaces[0].rect.top + " ,right : " + mFaces[0].rect.right + " ,bottom : " + mFaces[0].rect.bottom);
+                " ,top : " + mFaces[0].rect.top + " ,right : " + mFaces[0].rect.right +
+                " ,bottom : " + mFaces[0].rect.bottom + " ,centerX : " + mFaces[0].rect.centerX() +
+                " ,centerY : " + mFaces[0].rect.centerY());
         //mRectF.set(100, 100, 300, 300);
         //canvas.drawRect(mRectF, mLinePaint);
     }

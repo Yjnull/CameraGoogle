@@ -37,6 +37,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="AUTO FOCUS"/>
+
+        <Button
+            android:id="@+id/btn_change_camera"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHANGE CAMERA"/>
     </LinearLayout>
 
 

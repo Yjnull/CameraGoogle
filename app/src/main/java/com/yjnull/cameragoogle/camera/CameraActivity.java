@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.yjnull.cameragoogle.camera.CameraBaseInfo.cameraId;
+
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = "CameraActivity";
 
@@ -35,6 +37,12 @@ public class CameraActivity extends AppCompatActivity {
 
     private int isRange = -1; //人脸是否在范围内
     private boolean isTakePicture = true; //是否可以拍照
+
+    private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
+        @Override
+        public void onShutter() {
+        }
+    };
 
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
         @Override
@@ -71,6 +79,7 @@ public class CameraActivity extends AppCompatActivity {
                         Camera.Face[] faces = (Camera.Face[]) msg.obj;
                         isRange = msg.arg1;
                         faceView.setFaces(faces);
+                        faceView.setFaceColor(isRange);
                     } else {
                         faceView.clearFaces();
                     }
@@ -93,9 +102,14 @@ public class CameraActivity extends AppCompatActivity {
 
     //2. 获得Camera对象
     public static Camera getCameraInstance() {
+        return getCameraInstance(Camera.CameraInfo.CAMERA_FACING_BACK);
+    }
+
+    public static Camera getCameraInstance(int cameraId) {
         Camera c = null;
         try {
-            c = Camera.open();
+            c = Camera.open(cameraId);
+            CameraBaseInfo.cameraId = cameraId;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,8 +130,9 @@ public class CameraActivity extends AppCompatActivity {
             }*/
 
 
-            params.setPictureSize(3200, 2400);
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            //params.setPictureSize(3200, 2400); //后置摄像头
+            params.setPictureSize(2592, 1944); //前置摄像头
+            //params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             params.setJpegThumbnailQuality(100);
             params.setJpegQuality(100);
@@ -131,7 +146,7 @@ public class CameraActivity extends AppCompatActivity {
             Log.d(TAG, "  照片缩略图品质: " + params.getJpegThumbnailQuality());
             Log.d(TAG, "  照片品质: " + params.getJpegQuality());
             //Log.d(TAG, "  测光区域: " + params.getMeteringAreas().toString());
-            Log.d(TAG, "  最大测光区域数量: " + params.getMaxNumMeteringAreas());
+            /*Log.d(TAG, "  最大测光区域数量: " + params.getMaxNumMeteringAreas());
             Log.d(TAG, "  最大聚焦区域数量: " + params.getMaxNumFocusAreas());
             if (params.getMaxNumMeteringAreas() > 0) {
                 List<Camera.Area> meteringAreas = new ArrayList<>();
@@ -145,7 +160,7 @@ public class CameraActivity extends AppCompatActivity {
 
                 params.setMeteringAreas(meteringAreas);
 
-            }
+            }*/
 
             mCamera.setParameters(params);
             mCamera.setFaceDetectionListener(new GoogleFaceDetect(CameraActivity.this, mMainHandler));
@@ -175,8 +190,36 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (mCamera != null) {
-                    mCamera.takePicture(null, null, mPictureCallback);
+                    mCamera.takePicture(mShutterCallback, null, mPictureCallback);
                 }
+            }
+        });
+
+        //改变摄像头
+        Button changeBtn = (Button) findViewById(R.id.btn_change_camera);
+        changeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCamera.stopPreview();
+                if (mCamera != null) {
+                    mCamera.release();
+                    mCamera = null;
+                }
+
+                if (CameraBaseInfo.cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    mCamera = getCameraInstance(Camera.CameraInfo.CAMERA_FACING_BACK);
+                } else if (CameraBaseInfo.cameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    mCamera = getCameraInstance(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                }
+
+                mPreview2 = null;
+                mPreview2 = new CameraPreview2(CameraActivity.this, mCamera);
+                preview.removeAllViews();
+                preview.addView(mPreview2);
+
+                checkCameraFeatures();
+
+
             }
         });
 
@@ -210,29 +253,36 @@ public class CameraActivity extends AppCompatActivity {
             mCamera.autoFocus(new Camera.AutoFocusCallback() {
                 @Override
                 public void onAutoFocus(boolean success, Camera camera) {
-                    synchronized (CameraActivity.this) {
-                        if (isRange == 0 && success) {
-                            Log.d(TAG, "------------------------>  拍照了..." );
-                            isRange = -1;
-                            if (isTakePicture) {
-                                mCamera.takePicture(null, null, mPictureCallback);
-                                isTakePicture = false;
-                                mMainHandler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        isTakePicture = true;
-                                    }
-                                }, 3000);
-                            }
+                    Log.d(TAG, "onAutoFocus: " + success);
+                    if (isRange == 0 && success) {
+                        Log.d(TAG, "------------------------>  拍照了...");
+                        isRange = -1;
+                        if (isTakePicture) {
+                            isTakePicture = false;
+
+                            //延迟500ms拍照
+                            mMainHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mCamera.takePicture(mShutterCallback, null, mPictureCallback);
+                                }
+                            }, 500);
+
+                            //3s后才能重新拍照
+                            mMainHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    isTakePicture = true;
+                                }
+                            }, 3000);
                         }
-                        Log.d(TAG, "onAutoFocus: " + success);
-                        mMainHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                myAutoFocus();
-                            }
-                        }, 1500);
                     }
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            myAutoFocus();
+                        }
+                    }, 1500);
 
                 }
             });

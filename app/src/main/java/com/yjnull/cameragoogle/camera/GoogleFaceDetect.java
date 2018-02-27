@@ -27,19 +27,28 @@ public class GoogleFaceDetect implements Camera.FaceDetectionListener {
         msg.what = EventUtil.UPDATE_FACE_RECT;
         if (faces != null && faces.length > 0) {
             msg.obj = faces;
-            msg.arg1 = isRangeFaceDetect(faces[0]) ? 0 : -1; //0代表在区域内，-1代表不再区域内
+            msg.arg1 = isRangeFaceDetectFront(faces[0]) ? 0 : -1; //0代表在区域内，-1代表不再区域内
         } else {
             msg.obj = null;
         }
         msg.sendToTarget();
     }
 
-    public boolean isRangeFaceDetect(Camera.Face face) {
+    public boolean isRangeFaceDetectBack(Camera.Face face) {
         if ((face.rect.left >= -150 && face.rect.left <= 150) &&
                 (face.rect.top >= -500 && face.rect.left <= -10) &&
                 (face.rect.right >= 120 && face.rect.left <= 480) &&
                 (face.rect.bottom >= 120 && face.rect.left <= 480)) {
             Log.d(TAG, "------------------------>  在区域内了..." );
+            return true;
+        } else
+            return false;
+    }
+
+    public boolean isRangeFaceDetectFront(Camera.Face face) {
+        if ((face.rect.centerX() >= -260 && face.rect.centerX() <= 40) &&
+                (face.rect.centerY() >= -150 && face.rect.left <= 150)) {
+            Log.d(TAG, "------------------------>  前置摄像头 在区域内了..." );
             return true;
         } else
             return false;
