@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -33,6 +34,36 @@ public class DemoActivity_1 extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ------");
+        mListContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "onStart: " + mListContainer.getMeasuredWidth() + ", " + mListContainer.getMeasuredHeight());
+            }
+        });
+
+        ViewTreeObserver observer = mListContainer.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mListContainer.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                Log.d(TAG, "onGlobalLayout: " + mListContainer.getMeasuredWidth() + ", " + mListContainer.getMeasuredHeight());
+            }
+        });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.d(TAG, "onWindowFocusChanged: hasFocus : " + hasFocus);
+        if (hasFocus) {
+            Log.d(TAG, "onWindowFocusChanged: " + mListContainer.getMeasuredWidth() + ", " + mListContainer.getMeasuredHeight());
+        }
+    }
+
     private void initView() {
         LayoutInflater inflater = getLayoutInflater();
         mListContainer = (HorizontalScrollViewEx) findViewById(R.id.container);
@@ -48,6 +79,9 @@ public class DemoActivity_1 extends AppCompatActivity {
             createList(layout);
             mListContainer.addView(layout);
         }
+
+        //此时拿到的View的 宽、高 均为 0
+        Log.d(TAG, "initView: " + mListContainer.getMeasuredWidth() + ", " + mListContainer.getMeasuredHeight());
     }
 
     private void createList(ViewGroup layout) {

@@ -6,6 +6,15 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
+    <com.yjnull.cameragoogle.camera.chapter3.CircleView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#000"
+        android:layout_margin="20dp"
+        android:paddingLeft="10dp"
+        android:paddingEnd="20dp"
+        />
+
     <com.yjnull.cameragoogle.camera.chapter3.HorizontalScrollViewEx
         android:id="@+id/container"
         android:layout_width="wrap_content"

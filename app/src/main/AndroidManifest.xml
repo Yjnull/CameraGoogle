@@ -34,11 +34,11 @@
             android:name=".camera.CameraActivity"
             android:screenOrientation="landscape">
 
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity android:name=".camera.TestActivity">
             <!--<intent-filter>
@@ -48,11 +48,11 @@
             </intent-filter>-->
         </activity>
         <activity android:name=".camera.chapter3.DemoActivity_1">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>-->
+            </intent-filter>
         </activity>
     </application>
 
