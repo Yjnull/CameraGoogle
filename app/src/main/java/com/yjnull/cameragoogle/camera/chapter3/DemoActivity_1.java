@@ -87,7 +87,7 @@ public class DemoActivity_1 extends AppCompatActivity {
     private void createList(ViewGroup layout) {
         ListView listView = (ListView) layout.findViewById(R.id.list);
         ArrayList<String> datas = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < (int)(Math.random() * 40 + 10); i++) {
             datas.add("data " + i);
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,

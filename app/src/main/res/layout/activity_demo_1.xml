@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
     android:orientation="vertical">
 
@@ -11,8 +12,9 @@
         android:layout_height="wrap_content"
         android:background="#000"
         android:layout_margin="20dp"
+        app:circle_color="@color/colorPrimary"
         android:paddingLeft="10dp"
-        android:paddingEnd="20dp"
+        android:paddingRight="10dp"
         />
 
     <com.yjnull.cameragoogle.camera.chapter3.HorizontalScrollViewEx

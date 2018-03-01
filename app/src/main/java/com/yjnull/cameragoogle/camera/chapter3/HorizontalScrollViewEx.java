@@ -146,6 +146,11 @@ public class HorizontalScrollViewEx extends ViewGroup {
         int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
         if (childCount == 0) {
             setMeasuredDimension(0, 0);
+        } else if (widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST) {
+            final View childView = getChildAt(0);
+            measuredWidth = childView.getMeasuredWidth() * childCount;
+            measuredHeight = childView.getMeasuredHeight();
+            setMeasuredDimension(measuredWidth, measuredHeight);
         } else if (heightSpecMode == MeasureSpec.AT_MOST) {
             final View childView = getChildAt(0);
             measuredHeight = childView.getMeasuredHeight();
@@ -154,11 +159,6 @@ public class HorizontalScrollViewEx extends ViewGroup {
             final View childView = getChildAt(0);
             measuredWidth = childView.getMeasuredWidth() * childCount;
             setMeasuredDimension(measuredWidth, heightSpaceSize);
-        } else {
-            final View childView = getChildAt(0);
-            measuredWidth = childView.getMeasuredWidth() * childCount;
-            measuredHeight = childView.getMeasuredHeight();
-            setMeasuredDimension(measuredWidth, measuredHeight);
         }
     }
 
