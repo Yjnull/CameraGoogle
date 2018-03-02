@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <com.yjnull.cameragoogle.camera.chapter3.CircleView
+        android:id="@+id/circle_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#000"

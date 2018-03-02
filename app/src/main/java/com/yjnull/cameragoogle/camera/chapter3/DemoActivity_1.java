@@ -1,6 +1,7 @@
 package com.yjnull.cameragoogle.camera.chapter3;
 
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,15 @@ public class DemoActivity_1 extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: ");
         initView();
+
+        CircleView cv = (CircleView) findViewById(R.id.circle_view);
+        cv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: " +Environment.getExternalStorageDirectory().getPath());
+                throw new RuntimeException("自定义异常: 这是自己抛出的异常");
+            }
+        });
 
     }
 
