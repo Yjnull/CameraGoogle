@@ -1,5 +1,10 @@
 package com.yjnull.cameragoogle.camera.chapter3;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yjnull.cameragoogle.R;
+import com.yjnull.cameragoogle.camera.CameraActivity;
 import com.yjnull.cameragoogle.camera.utils.MyUtils;
 
 import java.util.ArrayList;
@@ -37,8 +43,22 @@ public class DemoActivity_1 extends AppCompatActivity {
         cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onClick: " +Environment.getExternalStorageDirectory().getPath());
-                throw new RuntimeException("自定义异常: 这是自己抛出的异常");
+                /*Log.d(TAG, "onClick: " +Environment.getExternalStorageDirectory().getPath());
+                throw new RuntimeException("自定义异常: 这是自己抛出的异常");*/
+
+                Notification notification = new Notification();
+                notification.icon = R.mipmap.ic_launcher;
+                notification.tickerText = "hello world";
+                notification.when = System.currentTimeMillis();
+                notification.flags = Notification.FLAG_AUTO_CANCEL;
+                Intent intent = new Intent(DemoActivity_1.this, CameraActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(DemoActivity_1.this,
+                        0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                //notification.setLatestEventInfo(DemoActivity_1.this, "chapter_5", "this is notification.", pendingIntent);
+
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.notify(1, notification);
+
             }
         });
 
