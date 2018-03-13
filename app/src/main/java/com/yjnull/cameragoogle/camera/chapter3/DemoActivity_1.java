@@ -38,7 +38,6 @@ public class DemoActivity_1 extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: ");
         initView();
-
         CircleView cv = (CircleView) findViewById(R.id.circle_view);
         cv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +45,7 @@ public class DemoActivity_1 extends AppCompatActivity {
                 /*Log.d(TAG, "onClick: " +Environment.getExternalStorageDirectory().getPath());
                 throw new RuntimeException("自定义异常: 这是自己抛出的异常");*/
 
-                Notification notification = new Notification();
+                /*Notification notification = new Notification();
                 notification.icon = R.mipmap.ic_launcher;
                 notification.tickerText = "hello world";
                 notification.when = System.currentTimeMillis();
@@ -57,7 +56,8 @@ public class DemoActivity_1 extends AppCompatActivity {
                 //notification.setLatestEventInfo(DemoActivity_1.this, "chapter_5", "this is notification.", pendingIntent);
 
                 NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.notify(1, notification);
+                manager.notify(1, notification);*/
+                startActivity(new Intent(DemoActivity_1.this, MyWindowActivity.class));
 
             }
         });
