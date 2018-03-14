@@ -63,6 +63,9 @@
         </activity>
         <activity android:name=".camera.chapter3.MyWindowActivity">
         </activity>
+
+        <service android:name=".camera.chapter3.MyIntentService"/>
+
     </application>
 
 </manifest>
