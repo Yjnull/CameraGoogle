@@ -15,10 +15,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yjnull.cameragoogle.R;
+import com.yjnull.cameragoogle.camera.utils.MyUtils;
 
+import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +44,10 @@ public class MyWindowActivity extends AppCompatActivity implements View.OnTouchL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_window);
 
+        ImageView bitmapImg = (ImageView) findViewById(R.id.bitmap_img);
+        bitmapImg.setImageBitmap(MyUtils.decodeSampleBitmapFromResource(getResources(),
+                R.mipmap.pay_type_alipay, 50, 50));
+
         /*Dialog dialog = new Dialog(this.getApplicationContext());
         TextView tv = new TextView(this);
         tv.setText("My Dialog");
@@ -48,7 +55,8 @@ public class MyWindowActivity extends AppCompatActivity implements View.OnTouchL
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED, 0);
         dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ERROR);
         dialog.show();*/
-        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+
+        /*mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mFloatingButton = new Button(this);
         mFloatingButton.setText("click me");
         mLayoutParams = new WindowManager.LayoutParams(
@@ -66,9 +74,9 @@ public class MyWindowActivity extends AppCompatActivity implements View.OnTouchL
             @Override
             public void onClick(View v) {
                 //Log.d(TAG, "onClick: AAAAAAAAAAAAAAAAAAAA");
-                /*new MyAsyncTask("Async#1").executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                *//*new MyAsyncTask("Async#1").executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 new MyAsyncTask("Async#2").executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                new MyAsyncTask("Async#3").executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);*/
+                new MyAsyncTask("Async#3").executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);*//*
                 Intent service = new Intent(MyWindowActivity.this, MyIntentService.class);
                 service.putExtra("task_action", "com.ryg.action.TASK1");
                 startService(service);
@@ -78,12 +86,8 @@ public class MyWindowActivity extends AppCompatActivity implements View.OnTouchL
                 startService(service);
             }
         });
-        mWindowManager.addView(mFloatingButton, mLayoutParams);
+        mWindowManager.addView(mFloatingButton, mLayoutParams);*/
 
-
-        HandlerThread ht = new HandlerThread(""){
-
-        };
     }
 
     @Override

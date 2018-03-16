@@ -3,6 +3,9 @@ package com.yjnull.cameragoogle.camera.utils;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -46,6 +49,43 @@ public class MyUtils {
 
     public static void executeInThread(Runnable runnable) {
         new Thread(runnable).start();
+    }
+
+    /**
+     * 高效加载Bitmap
+     */
+    public static Bitmap decodeSampleBitmapFromResource(Resources res, int resId,
+                                                        int reqWidth, int reqHeigth)
+    {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+
+        //1. 当此参数为true时, BitmapFactory 只会解析图片的原始宽/高,并不会真正加载图片
+        options.inJustDecodeBounds = true;
+        //2. 解析图片
+        BitmapFactory.decodeResource(res, resId, options);
+
+        //3. 计算 inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeigth);
+        //4. shewei false 重新加载图片
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeigth) {
+        final int width = options.outWidth;
+        final int height = options.outHeight;
+        int inSampleSize = 1;
+
+        if (height > reqHeigth || width > reqWidth) {
+            final int halfHeight = height/2;
+            final int halfWidth = width/2;
+            while ( (halfHeight / inSampleSize) >= reqHeigth
+                    && (halfWidth / inSampleSize) >= reqWidth ) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
 }

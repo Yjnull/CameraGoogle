@@ -160,6 +160,54 @@ public class Solution {
 
     }
 
+    public static ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode tail = dummy;
+
+        while(l1 != null && l2 != null) {
+            if (l1.val <= l2.val) {
+                tail.next = l1;
+                l1 = l1.next;
+            }else {
+                tail.next = l2;
+                l2 = l2.next;
+            }
+            tail = tail.next;
+        }
+
+        tail.next = l1 == null ? l2 : l1;
+
+        return dummy.next;
+    }
+
+
+    public static List<String> generateParenthesis(int n) {
+        List<String> combinations = new ArrayList<>();
+        generateAll(new char[2 * n], 0, combinations);
+        return combinations;
+    }
+
+    public static void generateAll(char[] current, int pos, List<String> result) {
+        if (pos == current.length) {
+            if (valid(current))
+                result.add(new String(current));
+        } else {
+            current[pos] = '(';
+            generateAll(current, pos+1, result);
+            current[pos] = ')';
+            generateAll(current, pos+1, result);
+        }
+    }
+
+    public static boolean valid(char[] current) {
+        int balance = 0;
+        for (char c: current) {
+            if (c == '(') balance++;
+            else balance--;
+            if (balance < 0) return false;
+        }
+        return (balance == 0);
+    }
 
     private ThreadLocal<Boolean> mBooleanThreadLocal = new ThreadLocal<>();
     private static final String TAG = "Solution";
@@ -188,18 +236,23 @@ public class Solution {
     }
 
     public static void main(String[] args) {
-        ListNode n = new ListNode(1);
-        /*n.next = new ListNode(2);
+        /*ListNode n = new ListNode(1);
+        n.next = new ListNode(2);
         n.next.next = new ListNode(3);
-        n.next.next.next = new ListNode(4);
+        *//*n.next.next.next = new ListNode(4);
         n.next.next.next.next = new ListNode(5);
-        n.next.next.next.next.next = new ListNode(6);*/
+        n.next.next.next.next.next = new ListNode(6);*//*
+        ListNode n2 = new ListNode(1);
+        n2.next = new ListNode(3);
+        n2.next.next = new ListNode(4);
 
-        ListNode ans = removeNthFromEnd(n, 1);
+        ListNode ans = mergeTwoLists(n, n2);
         while (ans.next != null) {
             System.out.print(ans.val);
             ans = ans.next;
         }
-        System.out.println(ans.val);
+        System.out.println(ans.val);*/
+
+        System.out.println(generateParenthesis(3));
     }
 }
